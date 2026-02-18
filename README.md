@@ -1,48 +1,39 @@
-# 🍜 Restaurant Finder
+# 🍽️ Recipe Generator
 
-A location-based restaurant discovery app built with **FastAPI + Streamlit**, powered entirely by free and open data sources. No API key. No billing. No credit card.
+A smart recipe discovery app built with **Streamlit**, powered by the **Spoonacular API**. Search any dish and instantly get full recipes with ingredients, step-by-step instructions, nutrition facts, and a serving scaler.
 
 ---
 
 ## What It Does
 
-- Search restaurants near any location in the world
-- Filter by search radius and cuisine keyword
-- View distance and travel time to each restaurant
-- Click any restaurant for full details: opening hours, phone, website, cuisine type
-- Sorted by distance from your searched location
-- Works with Nepali place names and scripts
+- Search any dish by name and get a matching recipe instantly
+- Scale ingredients and nutrition automatically based on desired servings
+- View full step-by-step cooking instructions
+- See detailed nutrition breakdown: calories, protein, carbs, fat, sugar, fiber
+- Dietary badges: Vegetarian, Vegan, Gluten-Free, Dairy-Free, Very Healthy
+- Price per serving shown in both USD and Nepali Rupees (NPR)
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Cost |
-|---|---|---|
-| Backend | FastAPI + Uvicorn | Free |
-| Frontend | Streamlit | Free |
-| Geocoding | Nominatim (OpenStreetMap) | Free |
-| Restaurant Data | Overpass API (OpenStreetMap) | Free |
-| Distance & Routing | OSRM | Free |
-
-**No Google Maps. No API key. No payment method required.**
+| Layer | Technology |
+|---|---|
+| Frontend | Streamlit |
+| Recipe Data | Spoonacular API |
+| Language | Python |
 
 ---
 
 ## Project Structure
 
 ```
-RestaurantFinder/
+RecipeGenerator/
 │
-├── backend/
-│   ├── main.py          ← FastAPI app (all API endpoints)
-│   ├── services.py      ← Nominatim, Overpass, OSRM calls
-│   └── requirements.txt
-│
-├── frontend/
-│   ├── app.py           ← Streamlit UI
-│   └── requirements.txt
-│
+├── app.py               ← Main Streamlit app
+├── requirements.txt     ← Python dependencies
+├── .env                 ← Your API key (never share or commit this)
+├── .env.example         ← Safe template to share
 ├── .gitignore
 └── README.md
 ```
@@ -51,163 +42,130 @@ RestaurantFinder/
 
 ## Setup & Installation
 
-### Prerequisites
+### Step 1 — Get a Spoonacular API Key
 
-- Python 3.8 or higher
-- pip
+1. Go to [spoonacular.com/food-api](https://spoonacular.com/food-api)
+2. Sign up for a free account
+3. Copy your API key from the dashboard
 
-Check your Python version:
-```powershell
-python --version
+### Step 2 — Store Your API Key Safely
+
+Create a `.env` file in your project folder:
+
+```
+SPOONACULAR_API_KEY=your_api_key_here
 ```
 
----
+Then load it in `app.py` like this:
 
-### Step 1 — Set Up the Backend
+```python
+import os
+from dotenv import load_dotenv
 
-Open a terminal and run:
-
-```powershell
-cd E:\RestaurantFinder\backend
-pip install fastapi uvicorn requests
-uvicorn main:app --reload
+load_dotenv()
+API_KEY = os.getenv("SPOONACULAR_API_KEY")
 ```
 
-You should see:
-```
-INFO:     Uvicorn running on http://127.0.0.1:8000
-```
+> ⚠️ Never hardcode your API key in the source code. Never commit `.env` to GitHub.
 
-Leave this terminal open.
-
----
-
-### Step 2 — Set Up the Frontend
-
-Open a **second terminal** and run:
+### Step 3 — Install Dependencies
 
 ```powershell
-cd E:\RestaurantFinder\frontend
-pip install streamlit requests
+pip install streamlit requests python-dotenv
+```
+
+### Step 4 — Run the App
+
+```powershell
 streamlit run app.py
 ```
 
-The app will open automatically at `http://localhost:8501`
+Opens automatically at `http://localhost:8501`
 
 ---
 
-### Step 3 — Test the Backend Directly (Optional)
+## How to Use
 
-Open this URL in your browser to confirm the backend is working:
-
-```
-http://127.0.0.1:8000/restaurants?location=Thamel,Kathmandu
-```
-
-You should see a JSON response with restaurant names, distances, and details.
+1. Enter a dish name in the sidebar (e.g. `lentil soup`, `chocolate cake`, `momo`)
+2. Set your desired number of servings using the number input
+3. Click **Generate Recipe**
+4. Browse ingredients, instructions, and nutrition — all scaled to your servings
 
 ---
 
-## API Endpoints
+## Spoonacular API Endpoints Used
 
-### Search restaurants near a location
-
+### 1. Complex Search
 ```
-GET /restaurants?location=Thamel,Kathmandu&radius=2000&keyword=momo
+GET https://api.spoonacular.com/recipes/complexSearch?query={dish}&apiKey={key}
 ```
+Finds a recipe ID matching the searched dish name.
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| location | string | ✅ Yes | Any place name or address |
-| radius | integer | No | Search radius in meters (default: 2000) |
-| keyword | string | No | Filter by name or cuisine (e.g. pizza, momo) |
-
-**Example response:**
-```json
-{
-  "query_location": "Thamel, Kathmandu, Nepal",
-  "count": 15,
-  "results": [
-    {
-      "name": "Everest Steak House",
-      "cuisine": "steak",
-      "distance": "958 m",
-      "duration": "2 mins",
-      "opening_hours": ["Mo-Su 10:00-22:00"]
-    }
-  ]
-}
+### 2. Recipe Information
 ```
+GET https://api.spoonacular.com/recipes/{id}/information?includeNutrition=true&apiKey={key}
+```
+Returns full recipe details: ingredients, instructions, nutrition, dietary flags, price.
 
 ---
 
-### Get full details for a restaurant
+## Free Tier Limits (Spoonacular)
 
-```
-GET /restaurant/{place_id}
-```
-
-Returns: name, cuisine, address, phone, website, email, opening hours, takeaway, delivery, wheelchair access, OpenStreetMap link.
-
----
-
-## How the Data Flow Works
-
-```
-User enters location
-        ↓
-Nominatim converts it to lat/lng coordinates
-        ↓
-Overpass API finds all restaurants within the radius
-        ↓
-OSRM calculates driving distance and time to each one
-        ↓
-Results sorted by distance and displayed in the UI
-        ↓
-User clicks a restaurant → Overpass fetches full details
-```
-
----
-
-## Known Limitations
-
-| Limitation | Reason |
+| Limit | Amount |
 |---|---|
-| No restaurant photos | OpenStreetMap does not store images |
-| Slow first load (15–30 sec) | Overpass API is a free community server |
-| Some restaurants missing info | OSM data depends on community contributions |
-| Occasional timeouts | Free Overpass servers get congested |
+| Requests per day | 150 |
+| Nutrition data | ✅ Included |
+| Images | ✅ Included |
 
-The app automatically tries 3 different Overpass servers if one fails.
-
----
-
-## Planned Upgrades
-
-- [ ] Show restaurants on an interactive map (Folium)
-- [ ] "Open Now" filter based on current time
-- [ ] User authentication and saved favourites
-- [ ] AI-powered "What should I eat tonight?" recommender
-- [ ] Export results to CSV
-- [ ] Deploy backend to Render.com
-- [ ] Deploy frontend to Streamlit Cloud
+The free tier is sufficient for personal use and development.
 
 ---
 
-## Data Sources & Credits
+## Features in Detail
 
-- **[OpenStreetMap](https://www.openstreetmap.org/)** — Restaurant data © OpenStreetMap contributors (ODbL)
-- **[Nominatim](https://nominatim.org/)** — Geocoding
-- **[Overpass API](https://overpass-api.de/)** — OSM data querying
-- **[OSRM](http://project-osrm.org/)** — Open Source Routing Machine
+### Serving Scaler
+Set any number of servings and all ingredient quantities and nutritional values adjust automatically. If a recipe serves 4 and you need 1, every measurement is divided by 4.
+
+### Nutrition Panel
+Displays scaled values per serving for:
+- 🔥 Calories
+- 🥩 Protein (g)
+- 🍞 Carbohydrates (g)
+- 🧈 Fat (g)
+- 🍬 Sugar (g)
+- 🌾 Fiber (g)
+
+### Price Per Serving
+Shown in USD and converted to Nepali Rupees (NPR) at Rs. 140 = $1.
+
+### Dietary Badges
+Automatically displayed if the recipe is Vegetarian, Vegan, Gluten-Free, Dairy-Free, or Very Healthy.
 
 ---
 
 ## Security Notes
 
-- This project requires **no API keys** and **no `.env` file**
-- There is nothing sensitive to protect
+- Store your API key in `.env` only — never in `app.py`
+- Add `.env` to `.gitignore` before pushing to GitHub
+- If your key is ever exposed, regenerate it immediately at [spoonacular.com/food-api/console](https://spoonacular.com/food-api/console)
 
 ---
 
-*Built with FastAPI + Streamlit · Data © OpenStreetMap contributors*
+## Planned Upgrades
+
+- [ ] Search by ingredient ("what's in my fridge?")
+- [ ] Filter by dietary preference (vegan, gluten-free, etc.)
+- [ ] Save favourite recipes locally
+- [ ] Compare two recipes side by side
+- [ ] Export recipe as PDF
+- [ ] Connect to Restaurant Finder — "Can't cook? Find this dish near you"
+
+---
+
+## Related Project
+
+**[Restaurant Finder](../RestaurantFinder/)** — a companion app to discover nearby restaurants by location, powered by OpenStreetMap. No API key or billing required.
+
+---
+
+*Built with Streamlit · Powered by Spoonacular API*
