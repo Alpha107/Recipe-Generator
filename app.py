@@ -6,7 +6,7 @@ import requests
 # ----------------------------
 SEARCH_URL = "https://api.spoonacular.com/recipes/complexSearch"
 INFO_URL   = "https://api.spoonacular.com/recipes/{id}/information"
-API_KEY    = "18b752a2c0be4256a98d46f176042dc3"
+API_KEY    = "Your API Key"
 
 # ----------------------------
 # PAGE CONFIG & STYLING
