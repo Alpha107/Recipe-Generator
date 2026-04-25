@@ -162,6 +162,28 @@ Automatically displayed if the recipe is Vegetarian, Vegan, Gluten-Free, Dairy-F
 
 ---
 
+## Project Images
+
+<img width="392" height="382" alt="Screenshot 2026-04-25 212837" src="https://github.com/user-attachments/assets/962536b4-bbca-4585-86b4-bc97ae259819" />
+
+---
+
+<img width="1777" height="835" alt="Screenshot 2026-04-25 212846" src="https://github.com/user-attachments/assets/5168af55-b1e1-49a1-b94a-356492b3cebe" />
+
+---
+
+<img width="849" height="744" alt="Screenshot 2026-04-25 212902" src="https://github.com/user-attachments/assets/6e6875c5-c0b1-4174-81bf-7a522f7dba02" />
+
+---
+
+<img width="875" height="643" alt="Screenshot 2026-04-25 212910" src="https://github.com/user-attachments/assets/a820805b-775b-401a-be28-e3892d5c3b91" />
+
+---
+
+<img width="803" height="732" alt="Screenshot 2026-04-25 213306" src="https://github.com/user-attachments/assets/2f7687b9-0fbb-48ce-9ade-c1abd4689899" />
+
+---
+
 ## Related Project
 
 **[Restaurant Finder](../RestaurantFinder/)** — a companion app to discover nearby restaurants by location, powered by OpenStreetMap. No API key or billing required.
